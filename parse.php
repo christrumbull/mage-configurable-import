@@ -112,10 +112,6 @@ class CSVParse
   }
 }
 
-
-		//fputcsv($out, array($customer['name'],$customer['email'],number_format($money_spent, 2),'1'));
-
-
   $csv = new CSVParse("test.csv");
 
   $csv->CreateConfigurable();
