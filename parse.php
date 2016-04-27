@@ -3,10 +3,11 @@
 class CSVParse
 {
 
-  public function __construct($handle, $del = ',')
+  public function __construct($handle, $del = ',', $newfile = 'new.csv')
   {
     $this->handle = $handle;
     $this->del    = $del;
+    $this->new    = uniqid()."-".$newfile;
   }
 
   public function in_array_r($needle, $haystack)
@@ -52,13 +53,15 @@ class CSVParse
     foreach($rows as $row)
     {
 
-      if(substr($row['SKU'], 0, strpos($row['SKU'], '-'))) {
+      if(substr($row['SKU'], 0, strpos($row['SKU'], '-')))
+      {
         $sku = substr($row['SKU'], 0, strpos($row['SKU'], '-'));
       } else {
         $sku = $row['SKU'];
       }
 
-      if(!$this->in_array_r($sku, $data)) {
+      if(!$this->in_array_r($sku, $data))
+      {
         $data[] =
                 array(
                   'sku' =>  $sku,
@@ -69,7 +72,8 @@ class CSVParse
 
     }
 
-    foreach ($data as $item => $value) {
+    foreach ($data as $item => $value)
+    {
       $i = 0;
       foreach ($rows as $row) {
         if(strpos($row['SKU'], $data[$item]['sku']) !== FALSE)
@@ -80,35 +84,25 @@ class CSVParse
         }
       }
     }
-    var_dump("<pre>",$data,"</pre>");
-    //return $data;
-  }
-
-  public function DataToCsv()
-  {
-    $data = array();
-    $rows = $this->DataToArray();
-    foreach($rows as $row)
-    {
-      $sku = substr($row['SKU'], 0, strpos($row['SKU'], '-'));
-
-      if(!$this->in_array_r($sku, $data))
-      {
-        $data[] =
-                array(
-                  'sku' => strtolower(trim($sku)),
-                  'name' => $row['Name'],
-                  'configurable' => $row['configurable']
-                );
-      }
-    }
     return $data;
   }
 
+  public function CreateCSV()
+  {
+    $new = fopen($this->new, "a");
+    $rows = $this->CreateConfigurable();
+    foreach ($rows as $row)
+    {
+		  fputcsv($new, array($row['sku'],$row['name'],$row['configurable']));
+    }
+    fclose($new);
+
+    echo "CSV Created";
+  }
 }
 
   $csv = new CSVParse("test.csv");
 
-  $csv->CreateConfigurable();
+  $csv->CreateCSV();
 
 ?>
