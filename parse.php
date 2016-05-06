@@ -53,20 +53,35 @@ class CSVParse
     foreach($rows as $row)
     {
 
-      if(substr($row['SKU'], 0, strpos($row['SKU'], '-')))
+      if(substr($row['sku'], 0, strpos($row['sku'], '-')))
       {
-        $sku = substr($row['SKU'], 0, strpos($row['SKU'], '-'));
-      } else {
-        $sku = $row['SKU'];
+        $sku = substr($row['sku'], 0, strpos($row['sku'], '-'));
+      }
+      else
+      {
+        $sku = $row['sku'];
+      }
+
+      if($row['short_description'])
+      {
+        $short = $row['short_description'];
+      }
+      else {
+        $short = $row['description'];
       }
 
       if(!$this->in_array_r($sku, $data))
       {
         $data[] =
                 array(
-                  'sku' =>  $sku,
-                  'name' => $row['Name'],
-                  'configurable' => NULL
+                  'sku'               => $sku,
+                  'name'              => $row['name'],
+                  'category_ids'      => $row['category'],
+                  'description'       => $row['description'],
+                  'short_description' => $short,
+                  'color'             => $row['color'],
+                  'price'             => $row['price'],
+                  'configurable'      => NULL
                 );
       }
 
@@ -76,10 +91,10 @@ class CSVParse
     {
       $i = 0;
       foreach ($rows as $row) {
-        if(strpos($row['SKU'], $data[$item]['sku']) !== FALSE)
+        if(strpos($row['sku'], $data[$item]['sku']) !== FALSE)
         {
           $del = ($i == 0) ? "" : ",";
-          $data[$item]['configurable'] .= $del.strtoupper($row['SKU']);
+          $data[$item]['configurable'] .= $del.strtoupper($row['sku']);
           $i++;
         }
       }
@@ -93,7 +108,7 @@ class CSVParse
     $rows = $this->CreateConfigurable();
     foreach ($rows as $row)
     {
-		  fputcsv($new, array($row['sku'],$row['name'],$row['configurable']));
+		  fputcsv($new, array($row['sku'],$row['name'],$row['configurable'],$row['category_ids'],$row['color'],$row['description'],$row['short_description'],$row['price']));
     }
     fclose($new);
 
@@ -101,7 +116,7 @@ class CSVParse
   }
 }
 
-  $csv = new CSVParse("test.csv");
+  $csv = new CSVParse("frenchie-spring-simple-import.csv");
 
   $csv->CreateCSV();
 
